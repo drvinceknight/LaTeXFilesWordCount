@@ -60,6 +60,6 @@ try:
     plt.xlabel("Words")
     plt.ylabel("Frequency")
     plt.title("Distribution of words counts in all my LaTeX documents\n ($N=%s$,mean=$%s$, max=$%s$)" % (len(data), sum(data)/len(data), max(data)))
-    plt.savefig('latexwordcountin%s.svg' % directory.replace("/", "-"))
+    plt.savefig('latexwordcountin%s.png' % directory.replace("/", "-"))
 except:
     print "Graph not produced, perhaps you don't have matplotlib installed..."
