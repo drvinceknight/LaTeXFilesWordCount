@@ -50,16 +50,16 @@ for f in matches:
 pickle.dump(wordcounts, open('latexwordcountin%s.pickle' % directory.replace("/", "-"), "w"))
 
 
-#try:
-data = [wordcounts[e] for e in wordcounts]
-if p != 0:
-    data = trim(data, p)
+try:
+    data = [wordcounts[e] for e in wordcounts]
+    if p != 0:
+        data = trim(data, p)
 
-plt.figure()
-plt.hist(data, bins=20)
-plt.xlabel("Words")
-plt.ylabel("Frequency")
-plt.title("Distribution of words counts in all my LaTeX documents\n ($N=%s$,mean=$%s$, max=$%s$)" % (len(data), sum(data)/len(data), max(data)))
-plt.savefig('latexwordcountin%s.svg' % directory.replace("/", "-"))
-#except:
-#    print "Graph not produced, perhaps you don't have matplotlib installed..."
+    plt.figure()
+    plt.hist(data, bins=20)
+    plt.xlabel("Words")
+    plt.ylabel("Frequency")
+    plt.title("Distribution of words counts in all my LaTeX documents\n ($N=%s$,mean=$%s$, max=$%s$)" % (len(data), sum(data)/len(data), max(data)))
+    plt.savefig('latexwordcountin%s.svg' % directory.replace("/", "-"))
+except:
+    print "Graph not produced, perhaps you don't have matplotlib installed..."
