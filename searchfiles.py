@@ -3,8 +3,10 @@ import fnmatch
 import os
 import subprocess
 import argparse
-import matplotlib.pyplot as plt
+import csv
 import pickle
+from matplotlib import pyplot as plt
+from scipy import stats
 
 def trim(t, p=0.01):
     """Trims the largest and smallest elements of t.
@@ -58,8 +60,8 @@ for f in matches:
         print "\t Couldn't count with wc..."
         fails[f] = err
 
-pickle.dump(wordcounts, open('latexwordcountin%s.pickle' % directory.replace("/", "-"), "w"))
-pickle.dump(codewordcounts, open('latexcodewordcountin%s.pickle' % directory.replace("/", "-"), "w"))
+pickle.dump(wordcounts, open('latexwordcount.pickle')
+pickle.dump(codewordcounts, open('latexcodewordcount.pickle')
 
 # Convert data to correct type
 
@@ -94,8 +96,8 @@ f.close()
 # Draw histogram
 
 plt.figure()
-plt.hist(x, bins=20, normed=True, color='b', label='Code words (N=%s, mean=%s)' %(len(x), sum(x)/len(x)) )
-plt.hist(x, bins=20, normed=True, color='r', label='Words (N=%s, mean=%s)' %(len(y), sum(y)/len(y)), alpha=.5 )
-plt.ylabel("Probability")
+plt.hist(x, bins=20,  color='b', label='Code words (N=%s, mean=%s)' %(len(x), sum(x)/len(x)) )
+plt.hist(y, bins=20,  color='r', alpha=0.5, label='Words (N=%s, mean=%s)' %(len(y), sum(y)/len(y)) )
+plt.ylabel("Frequency")
 plt.legend()
-plt.savefig('counthistogram.png'
+plt.savefig('counthistogram.png')
