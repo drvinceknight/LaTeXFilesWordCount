@@ -24,49 +24,67 @@ def trim(t, p=0.01):
     return t
 
 parser = argparse.ArgumentParser(description="A simple script to find word counts of all tex files in all subdirectories of a target directory.")
-parser.add_argument("directory", help="the directory you would like to search")
-parser.add_argument("-t", "--trim", help="trim data percentage", default=0)
+parser.add_argument("target", help="the directory or csv file you would like to search/use")
+parser.add_argument("-c", "--csv", help="statistical analysis on a csv file", action="store_true")
 args = parser.parse_args()
-directory = args.directory
-p = float(args.trim)
 
-matches = []
-for root, dirnames, filenames in os.walk(directory):
-  for filename in fnmatch.filter(filenames, '*.tex'):
-        matches.append(os.path.join(root, filename))
+if args.csv:
+    print "Reading data from csv file: %s" % args.target
+    f = open(args.target, 'r')
+    csvrdr = csv.reader(f)
+    x = []
+    y = []
+    for row in csvrdr:
+        x.append(int(row[0]))
+        y.append(int(row[1]))
+    f.close()
+else:
+    directory = args.target
+    matches = []
+    for root, dirnames, filenames in os.walk(directory):
+      for filename in fnmatch.filter(filenames, '*.tex'):
+            matches.append(os.path.join(root, filename))
 
-wordcounts = {}
-codewordcounts = {}
-fails = {}
-for f in matches:
-    #Quote the filename.
-    g = '"%s"'%f
-    print "-" * 30
-    print f
-    process = subprocess.Popen(['texcount', '-1', g],stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    try:
-        wordcounts[f] = eval(out.split()[0])
-        print "\t has %s words." % wordcounts[f]
-    except:
-        print "\t Couldn't count with texcount..."
-        fails[f] = err
-    process = subprocess.Popen(['wc', '-w', f],stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    try:
-        codewordcounts[f] = eval(out.split()[0])
-        print "\t has %s code words." % codewordcounts[f]
-    except:
-        print "\t Couldn't count with wc..."
-        fails[f] = err
+    wordcounts = {}
+    codewordcounts = {}
+    fails = {}
+    for f in matches:
+        #Quote the filename.
+        g = '"%s"'%f
+        print "-" * 30
+        print f
+        process = subprocess.Popen(['texcount', '-1', g],stdout=subprocess.PIPE)
+        out, err = process.communicate()
+        try:
+            wordcounts[f] = eval(out.split()[0])
+            print "\t has %s words." % wordcounts[f]
+        except:
+            print "\t Couldn't count with texcount..."
+            fails[f] = err
+        process = subprocess.Popen(['wc', '-w', f],stdout=subprocess.PIPE)
+        out, err = process.communicate()
+        try:
+            codewordcounts[f] = eval(out.split()[0])
+            print "\t has %s code words." % codewordcounts[f]
+        except:
+            print "\t Couldn't count with wc..."
+            fails[f] = err
 
-pickle.dump(wordcounts, open('latexwordcount.pickle', 'w'))
-pickle.dump(codewordcounts, open('latexcodewordcount.pickle', 'w'))
+    # Convert data to correct type
 
-# Convert data to correct type
+    x = [codewordcounts[e] for e in wordcounts]
+    y = [wordcounts[e] for e in wordcounts]
 
-x = [codewordcounts[e] for e in wordcounts]
-y = [wordcounts[e] for e in wordcounts]
+    # Write data to csv including file name
+
+    data = zip(x, y, [e for e in wordcounts])
+    f = open('wordsvcodewords.csv', 'w')
+    wrtr = csv.writer(f)
+    for row in data:
+        wrtr.writerow(row)
+    f.close()
+
+
 
 # Fit linear regression model
 
@@ -84,14 +102,6 @@ plt.ylim([0, plt.ylim()[1]])
 plt.legend()
 plt.savefig('wordsvcodewords.png')
 
-# Write data to csv including file name
-
-data = zip(x, y, [e for e in wordcounts])
-f = open('wordsvcodewords.csv', 'w')
-wrtr = csv.writer(f)
-for row in data:
-    wrtr.writerow(row)
-f.close()
 
 # Draw histogram
 
