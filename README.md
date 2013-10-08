@@ -6,7 +6,7 @@ A repo with a script to recursively run `latexcount` on all tex files in a targe
 
 I have written 2 blog posts showing the use of this script (as it has evolved):
 
-1.Just counting: [here](http://drvinceknight.blogspot.co.uk/2013/09/counting-words-in-all-my-latex-files.html).
+1. Just counting: [here](http://drvinceknight.blogspot.co.uk/2013/09/counting-words-in-all-my-latex-files.html).
 2. Regression model: [here](http://drvinceknight.blogspot.co.uk/2013/10/almost-2-to-1-ratio-of-code-words-to.html).
 
 # Usage
