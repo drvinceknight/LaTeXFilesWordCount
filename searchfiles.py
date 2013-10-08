@@ -34,32 +34,68 @@ for root, dirnames, filenames in os.walk(directory):
         matches.append(os.path.join(root, filename))
 
 wordcounts = {}
+codewordcounts = {}
 fails = {}
 for f in matches:
+    #Quote the filename.
+    g = '"%s"'%f
     print "-" * 30
     print f
-    process = subprocess.Popen(['texcount', '-1', f],stdout=subprocess.PIPE)
+    process = subprocess.Popen(['texcount', '-1', g],stdout=subprocess.PIPE)
     out, err = process.communicate()
     try:
         wordcounts[f] = eval(out.split()[0])
         print "\t has %s words." % wordcounts[f]
     except:
-        print "\t Couldn't count..."
+        print "\t Couldn't count with texcount..."
+        fails[f] = err
+    process = subprocess.Popen(['wc', '-w', f],stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    try:
+        codewordcounts[f] = eval(out.split()[0])
+        print "\t has %s code words." % codewordcounts[f]
+    except:
+        print "\t Couldn't count with wc..."
         fails[f] = err
 
 pickle.dump(wordcounts, open('latexwordcountin%s.pickle' % directory.replace("/", "-"), "w"))
+pickle.dump(codewordcounts, open('latexcodewordcountin%s.pickle' % directory.replace("/", "-"), "w"))
 
+# Convert data to correct type
 
-try:
-    data = [wordcounts[e] for e in wordcounts]
-    if p != 0:
-        data = trim(data, p)
+x = [codewordcounts[e] for e in wordcounts]
+y = [wordcounts[e] for e in wordcounts]
 
-    plt.figure()
-    plt.hist(data, bins=20)
-    plt.xlabel("Words")
-    plt.ylabel("Frequency")
-    plt.title("Distribution of words counts in all my LaTeX documents\n ($N=%s$,mean=$%s$, max=$%s$)" % (len(data), sum(data)/len(data), max(data)))
-    plt.savefig('latexwordcountin%s.png' % directory.replace("/", "-"))
-except:
-    print "Graph not produced, perhaps you don't have matplotlib installed..."
+# Fit linear regression model
+
+slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+
+# Plot scatter plot and fitted line
+
+plt.figure()
+plt.scatter(x, y, color='black')
+plt.plot(x, [slope * i + intercept for i in x], lw=2, label='y=%0.2f*x + %0.2f  (p=%0.2f)' % (slope, intercept, p_value))
+plt.xlabel("Code words")
+plt.ylabel("Words")
+plt.xlim([0, plt.xlim()[1]])
+plt.ylim([0, plt.ylim()[1]])
+plt.legend()
+plt.savefig('wordsvcodewords.png')
+
+# Write data to csv including file name
+
+data = zip(x, y, [e for e in wordcounts])
+f = open('wordsvcodewords.csv', 'w')
+wrtr = csv.writer(f)
+for row in data:
+    wrtr.writerow(row)
+f.close()
+
+# Draw histogram
+
+plt.figure()
+plt.hist(x, bins=20, normed=True, color='b', label='Code words (N=%s, mean=%s)' %(len(x), sum(x)/len(x)) )
+plt.hist(x, bins=20, normed=True, color='r', label='Words (N=%s, mean=%s)' %(len(y), sum(y)/len(y)), alpha=.5 )
+plt.ylabel("Probability")
+plt.legend()
+plt.savefig('counthistogram.png'
