@@ -8,27 +8,13 @@ import pickle
 from matplotlib import pyplot as plt
 from scipy import stats
 
-def trim(t, p=0.01):
-    """Trims the largest and smallest elements of t.
-
-    Args:
-    t: sequence of numbers
-    p: fraction of values to trim off each end
-
-    Returns:
-    sequence of values
-    """
-    t.sort()
-    n = int(p * len(t))
-    t = t[n:-n]
-    return t
-
 parser = argparse.ArgumentParser(description="A simple script to find word counts of all tex files in all subdirectories of a target directory.")
 parser.add_argument("target", help="the directory or csv file you would like to search/use")
 parser.add_argument("-c", "--csv", help="statistical analysis on a csv file", action="store_true")
 args = parser.parse_args()
 
 if args.csv:
+    # If -c tag passed read data from csv file in correct format
     print "Reading data from csv file: %s" % args.target
     f = open(args.target, 'r')
     csvrdr = csv.reader(f)
@@ -38,7 +24,9 @@ if args.csv:
         x.append(int(row[0]))
         y.append(int(row[1]))
     f.close()
+
 else:
+    # Else search through all subdirectories (recursively)
     directory = args.target
     matches = []
     for root, dirnames, filenames in os.walk(directory):
