@@ -60,8 +60,8 @@ for f in matches:
         print "\t Couldn't count with wc..."
         fails[f] = err
 
-pickle.dump(wordcounts, open('latexwordcount.pickle')
-pickle.dump(codewordcounts, open('latexcodewordcount.pickle')
+pickle.dump(wordcounts, open('latexwordcount.pickle', 'w'))
+pickle.dump(codewordcounts, open('latexcodewordcount.pickle', 'w'))
 
 # Convert data to correct type
 
