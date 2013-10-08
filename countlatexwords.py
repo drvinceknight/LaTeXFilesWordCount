@@ -82,7 +82,7 @@ slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
 
 plt.figure()
 plt.scatter(x, y, color='black')
-plt.plot(x, [slope * i + intercept for i in x], lw=2, label='y=%0.2f*x + %0.2f  (p=%0.2f)' % (slope, intercept, p_value))
+plt.plot(x, [slope * i + intercept for i in x], lw=2, label='y=%0.2f*x + %0.2f  (N=%s , p=%0.2f)' % (slope, intercept, len(x), p_value))
 plt.xlabel("Code words")
 plt.ylabel("Words")
 plt.xlim([0, plt.xlim()[1]])
