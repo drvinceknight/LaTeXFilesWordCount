@@ -38,7 +38,9 @@ else:
     fails = {}
     for f in matches:
         #Quote the filename.
-        g = '"%s"'%f
+        g = "%s"%f
+        if " " in g:
+            g = '"%s"'%g
         print "-" * 30
         print f
         process = subprocess.Popen(['texcount', '-1', g],stdout=subprocess.PIPE)
